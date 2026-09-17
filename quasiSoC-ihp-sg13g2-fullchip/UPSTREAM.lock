@@ -1,7 +1,0 @@
-quasiSoC.repository=https://github.com/regymm/quasiSoC
-quasiSoC.branch=master
-quasiSoC.commit=a5d2abefe7654a6f2d022b20807ca0b4862f732d
-template.repository=https://github.com/IHP-GmbH/ihp-sg13g2-librelane-template
-template.branch=main
-template.commit=0418301723d86133de686ef743cfd668bb3d11d4
-
