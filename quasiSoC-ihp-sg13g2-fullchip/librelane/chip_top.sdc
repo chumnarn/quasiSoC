@@ -1,12 +1,7 @@
-set clk_port [get_ports clk_PAD]
-create_clock -name core_clk -period 20.0 $clk_port
-set_clock_uncertainty 0.25 [get_clocks core_clk]
-set_clock_transition 0.15 [get_clocks core_clk]
-set in_ports [remove_from_collection [all_inputs] $clk_port]
-set_input_delay -min 0.0 -clock core_clk $in_ports
-set_input_delay -max 2.0 -clock core_clk $in_ports
-set_output_delay -min 0.0 -clock core_clk [all_outputs]
-set_output_delay -max 4.0 -clock core_clk [all_outputs]
+create_clock -name clk -period 20.000 [get_ports clk_PAD]
+set_clock_uncertainty 0.25 [get_clocks clk]
+set_input_transition 0.15 [all_inputs]
+set_input_delay 2.0 -clock clk [remove_from_collection [all_inputs] [get_ports clk_PAD]]
+set_output_delay 4.0 -clock clk [all_outputs]
 set_load 0.033442 [all_outputs]
-set_false_path -from [get_ports rst_n_PAD]
-
+set_false_path -from [get_ports {rst_n_PAD boot_sclk_PAD boot_cs_n_PAD boot_mosi_PAD boot_mode_PAD}]

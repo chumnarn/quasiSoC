@@ -4,47 +4,53 @@ meta:
   substituting_steps:
     Checker.IllegalOverlap: null
 DESIGN_NAME: chip_top
-VERILOG_FILES:
-  - dir::../src/chip_top.sv
-  - dir::../src/chip_core.sv
-  - dir::../src/quasi_soc_core.sv
-  - dir::../rtl/upstream/alu.v
-  - dir::../rtl/upstream/register_file.v
-  - dir::../rtl/upstream/rv32m.v
-  - dir::../rtl/upstream/privilege.v
-  - dir::../rtl/upstream/riscv-multicyc.v
-VERILOG_INCLUDE_DIRS: [dir::../rtl]
-VERILOG_DEFINES: [FUNCTIONAL, RV32M, IRQ_EN]
+VERILOG_FILES: ["dir::../build/rtl/*.sv"]
+VERILOG_INCLUDE_DIRS: [dir::../build/include]
+VERILOG_DEFINES: [SYNTHESIS, FUNCTIONAL]
+USE_SLANG: true
+SLANG_ARGUMENTS: ["--keep-hierarchy"]
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
-PAD_SOUTH: [clk_pad, rst_n_pad, "inputs\\[0\\].input_pad", "inputs\\[1\\].input_pad", "inputs\\[2\\].input_pad", "inputs\\[3\\].input_pad"]
-PAD_EAST: ["inputs\\[4\\].input_pad", "inputs\\[5\\].input_pad", "inputs\\[6\\].input_pad", "inputs\\[7\\].input_pad", vdd_pad, vss_pad]
-PAD_NORTH: ["outputs\\[7\\].output_pad", "outputs\\[6\\].output_pad", "outputs\\[5\\].output_pad", "outputs\\[4\\].output_pad", iovdd_pad, iovss_pad]
-PAD_WEST: ["outputs\\[3\\].output_pad", "outputs\\[2\\].output_pad", "outputs\\[1\\].output_pad", "outputs\\[0\\].output_pad"]
 PNR_SDC_FILE: dir::chip_top.sdc
 SIGNOFF_SDC_FILE: dir::chip_top.sdc
 FALLBACK_SDC: dir::chip_top.sdc
-VDD_NETS: [VDD]
-GND_NETS: [VSS]
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/p2c
 CLOCK_PERIOD: 20.0
+VDD_NETS: [VDD]
+GND_NETS: [VSS]
 FP_SIZING: absolute
-DIE_AREA: [0, 0, 1400, 1400]
-CORE_AREA: [365, 365, 1035, 1035]
+DIE_AREA: [0, 0, 1800, 1800]
+CORE_AREA: [365, 365, 1435, 1435]
 PL_TARGET_DENSITY_PCT: 35
 GRT_ALLOW_CONGESTION: true
 PDN_CORE_RING: true
 PDN_CORE_RING_CONNECT_TO_PADS: true
 PDN_ENABLE_PINS: false
-PDN_CORE_RING_VWIDTH: 15
-PDN_CORE_RING_HWIDTH: 15
-PDN_CORE_RING_VSPACING: 5
-PDN_CORE_RING_HSPACING: 5
-MAGIC_EXT_UNIQUE: notopports
+PDN_CFG: dir::pdn_cfg.tcl
 PAD_BONDPAD_NAME: bondpad_70x70_novias
 EXTRA_GDS: [dir::../ip/bondpad_70x70_novias/gds/bondpad_70x70_novias.gds]
 EXTRA_LEFS: [dir::../ip/bondpad_70x70_novias/lef/bondpad_70x70_novias.lef]
 IGNORE_DISCONNECTED_MODULES: [bondpad_70x70_novias]
-PDN_CFG: dir::pdn_cfg.tcl
+PAD_SOUTH: [clk_pad, rst_n_pad, boot_mode_pad, boot_sclk_pad, boot_cs_n_pad, boot_mosi_pad, irq_pad]
+PAD_WEST: ["inputs\\[0\\].gpio_in_pad", "inputs\\[1\\].gpio_in_pad", "inputs\\[2\\].gpio_in_pad", "inputs\\[3\\].gpio_in_pad", iovdd_pad, vdd_pad]
+PAD_NORTH: ["outputs\\[7\\].gpio_out_pad", "outputs\\[6\\].gpio_out_pad", "outputs\\[5\\].gpio_out_pad", "outputs\\[4\\].gpio_out_pad", "outputs\\[3\\].gpio_out_pad", "outputs\\[2\\].gpio_out_pad", "outputs\\[1\\].gpio_out_pad", "outputs\\[0\\].gpio_out_pad"]
+PAD_EAST: ["inputs\\[7\\].gpio_in_pad", "inputs\\[6\\].gpio_in_pad", "inputs\\[5\\].gpio_in_pad", "inputs\\[4\\].gpio_in_pad", boot_ready_pad, core_sleep_pad, iovss_pad, vss_pad]
+MAGIC_EXT_UNIQUE: notopports
+MACROS:
+  RM_IHPSG13_1P_1024x32_c2_bm_bist:
+    gds: [pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_1024x32_c2_bm_bist.gds]
+    lef: [pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_1024x32_c2_bm_bist.lef]
+    vh: [pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_1024x32_c2_bm_bist.v]
+    lib:
+      "*_typ_1p20V_25C": [pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_1024x32_c2_bm_bist_typ_1p20V_25C.lib]
+      "*_fast_1p32V_m40C": [pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_1024x32_c2_bm_bist_fast_1p32V_m55C.lib]
+      "*_slow_1p08V_125C": [pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_1024x32_c2_bm_bist_slow_1p08V_125C.lib]
+    instances:
+      i_soc.u_imem.u_sram: {location: [430, 430], orientation: N}
+      i_soc.u_dmem.u_sram: {location: [930, 430], orientation: N}
+PDN_MACRO_CONNECTIONS:
+  - "i_soc.u_imem.u_sram VDD VSS VDDARRAY! VSS!"
+  - "i_soc.u_imem.u_sram VDD VSS VDD! VSS!"
+  - "i_soc.u_dmem.u_sram VDD VSS VDDARRAY! VSS!"
+  - "i_soc.u_dmem.u_sram VDD VSS VDD! VSS!"
 MAGIC_GDS_FLATGLOB: ["lvsres_*", "VIA_M1_*", "VIA_M2_*", "*_CELL_CORNER", "RSC_*", "*_CELL_SUB"]
-
